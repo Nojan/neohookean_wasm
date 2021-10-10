@@ -39,6 +39,7 @@
 		<script src="https://threejs.org/build/three.js"></script>
 		<script src='https://threejs.org/examples/js/controls/OrbitControls.js'></script>		
 		<script>
+			var neohookeanModule;
 
 			var container = document.getElementById( 'container' );
 			var scene;
@@ -32306,10 +32307,16 @@ var dragonAttachedTriIds = [
 	29673, 29545, 29749,  29749, 169, 29673,  170, 169, 189,  
 	12692, 245, 244,  12692, 172, 245,  ];
 
+			(async () => {
+				const fetchPromise = fetch('neohookean.wasm');
+				neohookeanModule = await WebAssembly.instantiateStreaming(fetchPromise);
 
-			initThreeScene();
-			initPhysics();
-			animate();											
+				initThreeScene();
+				initPhysics();
+				animate();		
+			})();
+
+									
 
 		</script>
 
