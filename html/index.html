@@ -70,21 +70,47 @@
 					visVerts, visTriIds, visMaterial)
 				{
 					// physics data 
+					const { memory } = neohookeanModule.instance.exports
+					memory.grow(4);
 
 					this.numParticles = vertices.length / 3;
 					this.numElems = tetIds.length / 4;
 
-					this.pos = vertices.slice(0);
-					this.prevPos = vertices.slice(0);
-					this.vel = new Float32Array(3 * this.numParticles);
-					this.invMass = new Float32Array(this.numParticles);
-					this.invRestPose = new Float32Array(9 * this.numElems);
-					this.invRestVolume = new Float32Array(this.numElems);
+  					let bufferOffset = 0;
+					
+					let arrayLength = 3 * this.numParticles;
+					this.pos = new Float32Array(memory.buffer, bufferOffset, arrayLength);
+					bufferOffset += arrayLength * Float32Array.BYTES_PER_ELEMENT;
+
+					this.prevPos = new Float32Array(memory.buffer, bufferOffset, arrayLength);
+					bufferOffset += arrayLength * Float32Array.BYTES_PER_ELEMENT;
+
+					for (let i = 0; i < this.numParticles; i++) {
+						vecAdd(this.pos, i, vertices, i);
+						vecCopy(this.prevPos,i, this.pos,i);
+					}
+
+					this.vel = new Float32Array(memory.buffer, bufferOffset, arrayLength);
+					bufferOffset += arrayLength * Float32Array.BYTES_PER_ELEMENT;
+
+					arrayLength = this.numParticles;
+					this.invMass = new Float32Array(memory.buffer, bufferOffset, arrayLength);
+					bufferOffset += arrayLength * Float32Array.BYTES_PER_ELEMENT;
+
+					arrayLength = 9 * this.numElems;
+					this.invRestPose = new Float32Array(memory.buffer, bufferOffset, arrayLength);
+					bufferOffset += arrayLength * Float32Array.BYTES_PER_ELEMENT;
+
+					arrayLength = this.numElems;
+					this.invRestVolume = new Float32Array(memory.buffer, bufferOffset, arrayLength);
+					bufferOffset += arrayLength * Float32Array.BYTES_PER_ELEMENT;
 
 					this.tetIds = tetIds;
 					this.volError = 0.0;
 
-					this.grabPos = new Float32Array(3);
+					arrayLength = 3;
+					this.grabPos = new Float32Array(memory.buffer, bufferOffset, arrayLength);
+					bufferOffset += arrayLength * Float32Array.BYTES_PER_ELEMENT;
 					this.grabId = -1;
 
 					this.devCompliance = devCompliance;
@@ -95,10 +121,19 @@
 
 					// solve data: define here to avoid memory allocation during solve
 
-					this.P = new Float32Array(9);		
-					this.F = new Float32Array(9);
-					this.dF = new Float32Array(9);
-					this.grads = new Float32Array(12);		
+					arrayLength = 9;
+					this.P = new Float32Array(memory.buffer, bufferOffset, arrayLength);
+					bufferOffset += arrayLength * Float32Array.BYTES_PER_ELEMENT;
+
+					this.F = new Float32Array(memory.buffer, bufferOffset, arrayLength);
+					bufferOffset += arrayLength * Float32Array.BYTES_PER_ELEMENT;
+
+					this.dF = new Float32Array(memory.buffer, bufferOffset, arrayLength);
+					bufferOffset += arrayLength * Float32Array.BYTES_PER_ELEMENT;
+
+					arrayLength = 12;
+					this.grads = new Float32Array(memory.buffer, bufferOffset, arrayLength);
+					bufferOffset += arrayLength * Float32Array.BYTES_PER_ELEMENT;	
 
 					this.initPhysics(density);
 
