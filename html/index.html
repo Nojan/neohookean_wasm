@@ -73,6 +73,8 @@
 					const { memory } = neohookeanModule.instance.exports
 					memory.grow(4);
 
+					const {vecCopy} = neohookeanModule.instance.exports;
+
 					this.numParticles = vertices.length / 3;
 					this.numElems = tetIds.length / 4;
 
@@ -87,7 +89,7 @@
 
 					for (let i = 0; i < this.numParticles; i++) {
 						vecAdd(this.pos, i, vertices, i);
-						vecCopy(this.prevPos,i, this.pos,i);
+						vecCopy(this.prevPos.byteOffset,i, this.pos.byteOffset,i);
 					}
 
 					this.vel = new Float32Array(memory.buffer, bufferOffset, arrayLength);
@@ -302,11 +304,13 @@
 
 				simulate(dt, gravity)
 				{
+					const {vecCopy} = neohookeanModule.instance.exports;
+					
 					// XPBD prediction
 
 					for (let i = 0; i < this.numParticles; i++) {
 						vecAdd(this.vel,i, gravity,0, dt);
-						vecCopy(this.prevPos,i, this.pos,i);
+						vecCopy(this.prevPos.byteOffset,i, this.pos.byteOffset,i);
 						vecAdd(this.pos,i, this.vel,i, dt);
 					}
 
@@ -340,7 +344,7 @@
 					}
 
 					if (this.grabId >= 0) {
-						vecCopy(this.pos,this.grabId, this.grabPos,0);
+						vecCopy(this.pos.byteOffset,this.grabId, this.grabPos.byteOffset,0);
 					}
 
 					// XPBD velocity update
