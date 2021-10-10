@@ -7,3 +7,11 @@ void vecCopy(float* a, int anr, float* b, int bnr) {
     a[anr++] = b[bnr++]; 
     a[anr]   = b[bnr];
 }
+
+__attribute__((used)) 
+void vecAdd(float* a, int anr, float* b, int bnr, float scale) {
+    anr *= 3; bnr *= 3;
+    a[anr++] += b[bnr++] * scale; 
+    a[anr++] += b[bnr++] * scale; 
+    a[anr]   += b[bnr] * scale;
+}

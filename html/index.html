@@ -305,13 +305,13 @@
 				simulate(dt, gravity)
 				{
 					const {vecCopy} = neohookeanModule.instance.exports;
-					
+					const wasmVecAdd = neohookeanModule.instance.exports.vecAdd;
 					// XPBD prediction
 
 					for (let i = 0; i < this.numParticles; i++) {
 						vecAdd(this.vel,i, gravity,0, dt);
 						vecCopy(this.prevPos.byteOffset,i, this.pos.byteOffset,i);
-						vecAdd(this.pos,i, this.vel,i, dt);
+						wasmVecAdd(this.pos.byteOffset,i, this.vel.byteOffset,i, dt);
 					}
 
 					// solve
