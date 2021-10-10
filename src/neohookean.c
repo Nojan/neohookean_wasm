@@ -33,3 +33,10 @@ void vecSetDiff(float* dst, int dnr, float* a, int anr, float* b, int bnr, doubl
     dst[dnr++] = (a[anr++] - b[bnr++]) * scale;
     dst[dnr]   = (a[anr] - b[bnr]) * scale;
 }
+
+__attribute__((used)) 
+double vecLengthSquared(float* a, int anr) {
+    anr *= 3;
+    double a0 = a[anr], a1 = a[anr + 1], a2 = a[anr + 2];
+    return a0 * a0 + a1 * a1 + a2 * a2;
+}
