@@ -280,7 +280,7 @@
 						return;
 					let g = this.grads;
 
-					const {vecSetZero, vecAdd} = neohookeanModule.instance.exports;
+					const {vecSetZero, vecAdd, vecLengthSquared} = neohookeanModule.instance.exports;
 
 					vecSetZero(g.byteOffset,0);
 					vecAdd(g.byteOffset,0, g.byteOffset,1, -1.0);
@@ -290,7 +290,7 @@
 					let w = 0.0;
 					for (let i = 0; i < 4; i++) {
 						let id = this.tetIds[4 * elemNr + i];
-						w += vecLengthSquared(g,i) * this.invMass[id];
+						w += vecLengthSquared(g.byteOffset,i) * this.invMass[id];
 					}
 
 					if (w == 0.0) 
