@@ -306,6 +306,7 @@
 				{
 					const {vecCopy} = neohookeanModule.instance.exports;
 					const wasmVecAdd = neohookeanModule.instance.exports.vecAdd;
+					const wasmVecSetDiff = neohookeanModule.instance.exports.vecSetDiff;
 					// XPBD prediction
 
 					for (let i = 0; i < this.numParticles; i++) {
@@ -332,7 +333,7 @@
 							this.pos[3 * i + 1] = 0.0;
 
 							// simple friction
-							vecSetDiff(this.F,0, this.prevPos,i, this.pos,i);
+							wasmVecSetDiff(this.F.byteOffset,0, this.prevPos.byteOffset,i, this.pos.byteOffset,i, 1.0);
 
 							this.pos[3 * i] += this.F[0] * Math.min(1.0, dt * physicsParams.friction);
 							this.pos[3 * i + 2] += this.F[2] * Math.min(1.0, dt * physicsParams.friction);
@@ -350,7 +351,7 @@
 					// XPBD velocity update
 
 					for (let i = 0; i < this.pos.length / 3; i++) 
-						vecSetDiff(this.vel,i, this.pos,i, this.prevPos,i, 1.0 / dt);
+						wasmVecSetDiff(this.vel.byteOffset,i, this.pos.byteOffset,i, this.prevPos.byteOffset,i, 1.0 / dt);
 				}
 
 				// ----------------- end solver -----------------------------------------------------				

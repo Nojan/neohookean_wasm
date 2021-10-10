@@ -16,3 +16,12 @@ void vecAdd(float* a, int anr, float* b, int bnr, double s) {
     a[anr++] += b[bnr++] * scale; 
     a[anr]   += b[bnr] * scale;
 }
+
+__attribute__((used)) 
+void vecSetDiff(float* dst, int dnr, float* a, int anr, float* b, int bnr, double s) {
+    float scale = s;
+    dnr *= 3; anr *= 3; bnr *= 3;
+    dst[dnr++] = (a[anr++] - b[bnr++]) * scale;
+    dst[dnr++] = (a[anr++] - b[bnr++]) * scale;
+    dst[dnr]   = (a[anr] - b[bnr]) * scale;
+}
