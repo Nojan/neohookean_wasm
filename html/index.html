@@ -349,7 +349,7 @@
 
 					// XPBD velocity update
 
-					for (let i = 0; i < this.pos.length; i++) 
+					for (let i = 0; i < this.pos.length / 3; i++) 
 						vecSetDiff(this.vel,i, this.pos,i, this.prevPos,i, 1.0 / dt);
 				}
 
