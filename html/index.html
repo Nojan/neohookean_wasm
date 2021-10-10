@@ -107,7 +107,12 @@
 					this.invRestVolume = new Float32Array(memory.buffer, bufferOffset, arrayLength);
 					bufferOffset += arrayLength * Float32Array.BYTES_PER_ELEMENT;
 
-					this.tetIds = tetIds;
+					arrayLength = tetIds.length;
+					this.tetIds = new Int32Array(memory.buffer, bufferOffset, arrayLength);
+					bufferOffset += arrayLength * Int32Array.BYTES_PER_ELEMENT;
+					for (let i = 0; i < arrayLength; i++) {
+						this.tetIds[i] = tetIds[i];
+					}
 					this.volError = 0.0;
 
 					arrayLength = 3;
