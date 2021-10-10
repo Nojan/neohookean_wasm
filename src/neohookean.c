@@ -9,7 +9,8 @@ void vecCopy(float* a, int anr, float* b, int bnr) {
 }
 
 __attribute__((used)) 
-void vecAdd(float* a, int anr, float* b, int bnr, float scale) {
+void vecAdd(float* a, int anr, float* b, int bnr, double s) {
+    float scale = s;
     anr *= 3; bnr *= 3;
     a[anr++] += b[bnr++] * scale; 
     a[anr++] += b[bnr++] * scale; 
