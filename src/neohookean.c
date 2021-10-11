@@ -54,6 +54,14 @@ void matSetVecProduct(float* dst, int dnr, float* A, int anr, float* b, int bnr)
 }
 
 __attribute__((used)) 
+void matSetMatProduct(float* Dst, int dnr, float* A, int anr, float* B, int bnr) {
+    dnr *= 3; bnr *= 3;
+    matSetVecProduct(Dst,dnr++, A,anr, B,bnr++);
+    matSetVecProduct(Dst,dnr++, A,anr, B,bnr++);
+    matSetVecProduct(Dst,dnr++, A,anr, B,bnr++);
+}
+
+__attribute__((used)) 
 void applyToElem(int elemNr, double C, double compliance, double dt, float* grads, float* invMass, float* invRestVolume, int* tetIds, float* pos) 
 {
     if (C == 0.0)

@@ -199,7 +199,7 @@
 
 				solveElem(elemNr, dt) 
 				{
-					const {applyToElem} = neohookeanModule.instance.exports;
+					const {applyToElem, matSetMatProduct} = neohookeanModule.instance.exports;
 
 					var C = 0.0;
 					let g = this.grads;
@@ -216,7 +216,7 @@
 					vecSetDiff(this.P,1, this.pos,id2, this.pos,id0);
 					vecSetDiff(this.P,2, this.pos,id3, this.pos,id0);
 
-					matSetMatProduct(this.F,0, this.P,0, this.invRestPose,elemNr);
+					matSetMatProduct(this.F.byteOffset,0, this.P.byteOffset,0, this.invRestPose.byteOffset,elemNr);
 
 					var r_s = Math.sqrt(vecLengthSquared(this.F,0) + vecLengthSquared(this.F,1) + vecLengthSquared(this.F,2));
 					var r_s_inv = 1.0 / r_s;
@@ -247,7 +247,7 @@
 					vecSetDiff(this.P,1, this.pos,id2, this.pos,id0);
 					vecSetDiff(this.P,2, this.pos,id3, this.pos,id0);
 
-					matSetMatProduct(this.F,0, this.P,0, this.invRestPose,elemNr);
+					matSetMatProduct(this.F.byteOffset,0, this.P.byteOffset,0, this.invRestPose.byteOffset,elemNr);
 
 					vecSetCross(this.dF,0, this.F,1, this.F,2);
 					vecSetCross(this.dF,1, this.F,2, this.F,0);
