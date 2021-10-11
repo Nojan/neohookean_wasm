@@ -42,6 +42,11 @@ double vecLengthSquared(float* a, int anr) {
 }
 
 __attribute__((used)) 
+double matIJ(float* A, int anr, int row, int col) {
+    return A[9*anr + 3 * col + row];
+}
+
+__attribute__((used)) 
 void matSetVecProduct(float* dst, int dnr, float* A, int anr, float* b, int bnr) {
     bnr *= 3; anr *= 3;
     const double b0 = b[bnr++];

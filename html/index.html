@@ -199,7 +199,7 @@
 
 				solveElem(elemNr, dt) 
 				{
-					const {applyToElem, matSetMatProduct, matGetDeterminant, vecLengthSquared} = neohookeanModule.instance.exports;
+					const {applyToElem, matSetMatProduct, matGetDeterminant, vecLengthSquared, matIJ} = neohookeanModule.instance.exports;
 
 					var C = 0.0;
 					let g = this.grads;
@@ -222,19 +222,19 @@
 					var r_s_inv = 1.0 / r_s;
 
 					vecSetZero(g,1);
-					vecAdd(g,1, this.F,0, r_s_inv * matIJ(ir,elemNr, 0,0));
-					vecAdd(g,1, this.F,1, r_s_inv * matIJ(ir,elemNr, 0,1));
-					vecAdd(g,1, this.F,2, r_s_inv * matIJ(ir,elemNr, 0,2));
+					vecAdd(g,1, this.F,0, r_s_inv * matIJ(ir.byteOffset,elemNr, 0,0));
+					vecAdd(g,1, this.F,1, r_s_inv * matIJ(ir.byteOffset,elemNr, 0,1));
+					vecAdd(g,1, this.F,2, r_s_inv * matIJ(ir.byteOffset,elemNr, 0,2));
 
 					vecSetZero(g,2);
-					vecAdd(g,2, this.F,0, r_s_inv * matIJ(ir,elemNr, 1,0));
-					vecAdd(g,2, this.F,1, r_s_inv * matIJ(ir,elemNr, 1,1));
-					vecAdd(g,2, this.F,2, r_s_inv * matIJ(ir,elemNr, 1,2));
+					vecAdd(g,2, this.F,0, r_s_inv * matIJ(ir.byteOffset,elemNr, 1,0));
+					vecAdd(g,2, this.F,1, r_s_inv * matIJ(ir.byteOffset,elemNr, 1,1));
+					vecAdd(g,2, this.F,2, r_s_inv * matIJ(ir.byteOffset,elemNr, 1,2));
 
 					vecSetZero(g,3);
-					vecAdd(g,3, this.F,0, r_s_inv * matIJ(ir,elemNr, 2,0));
-					vecAdd(g,3, this.F,1, r_s_inv * matIJ(ir,elemNr, 2,1));
-					vecAdd(g,3, this.F,2, r_s_inv * matIJ(ir,elemNr, 2,2));
+					vecAdd(g,3, this.F,0, r_s_inv * matIJ(ir.byteOffset,elemNr, 2,0));
+					vecAdd(g,3, this.F,1, r_s_inv * matIJ(ir.byteOffset,elemNr, 2,1));
+					vecAdd(g,3, this.F,2, r_s_inv * matIJ(ir.byteOffset,elemNr, 2,2));
 
 					C = r_s; 
 
@@ -254,19 +254,19 @@
 					vecSetCross(this.dF,2, this.F,0, this.F,1);
 
 					vecSetZero(g,1);
-					vecAdd(g,1, this.dF,0, matIJ(ir,elemNr, 0,0));
-					vecAdd(g,1, this.dF,1, matIJ(ir,elemNr, 0,1));
-					vecAdd(g,1, this.dF,2, matIJ(ir,elemNr, 0,2));
+					vecAdd(g,1, this.dF,0, matIJ(ir.byteOffset,elemNr, 0,0));
+					vecAdd(g,1, this.dF,1, matIJ(ir.byteOffset,elemNr, 0,1));
+					vecAdd(g,1, this.dF,2, matIJ(ir.byteOffset,elemNr, 0,2));
 
 					vecSetZero(g,2);
-					vecAdd(g,2, this.dF,0, matIJ(ir,elemNr, 1,0));
-					vecAdd(g,2, this.dF,1, matIJ(ir,elemNr, 1,1));
-					vecAdd(g,2, this.dF,2, matIJ(ir,elemNr, 1,2));
+					vecAdd(g,2, this.dF,0, matIJ(ir.byteOffset,elemNr, 1,0));
+					vecAdd(g,2, this.dF,1, matIJ(ir.byteOffset,elemNr, 1,1));
+					vecAdd(g,2, this.dF,2, matIJ(ir.byteOffset,elemNr, 1,2));
 
 					vecSetZero(g,3);
-					vecAdd(g,3, this.dF,0, matIJ(ir,elemNr, 2,0));
-					vecAdd(g,3, this.dF,1, matIJ(ir,elemNr, 2,1));
-					vecAdd(g,3, this.dF,2, matIJ(ir,elemNr, 2,2));
+					vecAdd(g,3, this.dF,0, matIJ(ir.byteOffset,elemNr, 2,0));
+					vecAdd(g,3, this.dF,1, matIJ(ir.byteOffset,elemNr, 2,1));
+					vecAdd(g,3, this.dF,2, matIJ(ir.byteOffset,elemNr, 2,2));
 
 					var vol = matGetDeterminant(this.F.byteOffset,0)
 					C = vol - 1.0 - this.mu/this.lambda
