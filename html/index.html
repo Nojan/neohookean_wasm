@@ -199,7 +199,7 @@
 
 				solveElem(elemNr, dt) 
 				{
-					const {applyToElem, matSetMatProduct} = neohookeanModule.instance.exports;
+					const {applyToElem, matSetMatProduct, matGetDeterminant} = neohookeanModule.instance.exports;
 
 					var C = 0.0;
 					let g = this.grads;
@@ -268,7 +268,7 @@
 					vecAdd(g,3, this.dF,1, matIJ(ir,elemNr, 2,1));
 					vecAdd(g,3, this.dF,2, matIJ(ir,elemNr, 2,2));
 
-					var vol = matGetDeterminant(this.F,0)
+					var vol = matGetDeterminant(this.F.byteOffset,0)
 					C = vol - 1.0 - this.mu/this.lambda
 
 					this.volError += vol - 1.0;

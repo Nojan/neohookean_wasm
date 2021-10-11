@@ -62,6 +62,15 @@ void matSetMatProduct(float* Dst, int dnr, float* A, int anr, float* B, int bnr)
 }
 
 __attribute__((used)) 
+double matGetDeterminant(float* A, int anr) {
+    anr *= 9;
+    double a11 = A[anr + 0], a12 = A[anr + 3], a13 = A[anr + 6];
+    double a21 = A[anr + 1], a22 = A[anr + 4], a23 = A[anr + 7];
+    double a31 = A[anr + 2], a32 = A[anr + 5], a33 = A[anr + 8];
+    return a11*a22*a33 + a12*a23*a31 + a13*a21*a32 - a13*a22*a31 - a12*a21*a33 - a11*a23*a32;
+}
+
+__attribute__((used)) 
 void applyToElem(int elemNr, double C, double compliance, double dt, float* grads, float* invMass, float* invRestVolume, int* tetIds, float* pos) 
 {
     if (C == 0.0)
