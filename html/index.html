@@ -204,6 +204,8 @@
 
 				solveElem(elemNr, dt) 
 				{
+					const {applyToElem} = neohookeanModule.instance.exports;
+
 					var C = 0.0;
 					let g = this.grads;
 					let ir = this.invRestPose;
@@ -242,7 +244,7 @@
 					C = r_s; 
 
 
-					this.applyToElem(elemNr, C, this.devCompliance, dt);
+					applyToElem(elemNr, C, this.devCompliance, dt, this.grads.byteOffset, this.invMass.byteOffset, this.invRestVolume.byteOffset, this.tetIds.byteOffset, this.pos.byteOffset);
 					
 					// det F = 1
 
@@ -276,7 +278,7 @@
 
 					this.volError += vol - 1.0;
 					
-					this.applyToElem(elemNr, C, this.volCompliance, dt);
+					applyToElem(elemNr, C, this.volCompliance, dt, this.grads.byteOffset, this.invMass.byteOffset, this.invRestVolume.byteOffset, this.tetIds.byteOffset, this.pos.byteOffset);
 				}
 
 				applyToElem(elemNr, C, compliance, dt) 

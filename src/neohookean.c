@@ -40,3 +40,32 @@ double vecLengthSquared(float* a, int anr) {
     double a0 = a[anr], a1 = a[anr + 1], a2 = a[anr + 2];
     return a0 * a0 + a1 * a1 + a2 * a2;
 }
+
+__attribute__((used)) 
+void applyToElem(int elemNr, double C, double compliance, double dt, float* grads, float* invMass, float* invRestVolume, int* tetIds, float* pos) 
+{
+    if (C == 0.0)
+        return;
+    float* g = grads;
+
+    vecSetZero(g,0);
+    vecAdd(g,0, g,1, -1.0);
+    vecAdd(g,0, g,2, -1.0);
+    vecAdd(g,0, g,3, -1.0);
+
+    double w = 0.0;
+    for (int i = 0; i < 4; i++) {
+        int id = tetIds[4 * elemNr + i];
+        w += vecLengthSquared(g,i) * invMass[id];
+    }
+
+    if (w == 0.0) 
+        return;
+    double alpha = compliance / dt / dt * invRestVolume[elemNr];
+    double dlambda = -C / (w + alpha);
+
+    for (int i = 0; i < 4; i++) {
+        int id = tetIds[4 * elemNr + i];
+        vecAdd(pos,id, g,i, dlambda * invMass[id]);
+    }
+}
