@@ -1,4 +1,5 @@
-//clang src/neohookean.c --target=wasm32-unknown-unknown-wasm --optimize=3 -nostdlib -Wl,--export-all -Wl,--no-entry -Wl,--allow-undefined --output html/neohookean.wasm
+//emcc src/neohookean.c -s TOTAL_MEMORY=32MB -O3 --no-entry -o html/neohookean.wasm
+#include <math.h>
 
 __attribute__((used)) 
 void vecSetZero(float* a, int anr) {
@@ -110,4 +111,87 @@ void applyToElem(int elemNr, double C, double compliance, double dt, float* grad
         int id = tetIds[4 * elemNr + i];
         vecAdd(pos,id, g,i, dlambda * invMass[id]);
     }
+}
+
+__attribute__((used)) 
+double solveElem(int elemNr, double dt, double devCompliance, double volCompliance, float* grads, float* P, float* F, float* dF, float* invMass, float* invRestVolume, float* invRestPose, int* tetIds, float* pos, double volError) 
+{
+    double C = 0.0;
+    float* g = grads;
+    float* ir = invRestPose;
+
+    // tr(F) = 3
+
+    int id0 = tetIds[4 * elemNr];
+    int id1 = tetIds[4 * elemNr + 1];
+    int id2 = tetIds[4 * elemNr + 2];
+    int id3 = tetIds[4 * elemNr + 3];
+
+    vecSetDiff(P,0, pos,id1, pos,id0, 1.0);
+    vecSetDiff(P,1, pos,id2, pos,id0, 1.0);
+    vecSetDiff(P,2, pos,id3, pos,id0, 1.0);
+
+    matSetMatProduct(F,0, P,0, invRestPose,elemNr);
+
+    double r_s = sqrt(vecLengthSquared(F,0) + vecLengthSquared(F,1) + vecLengthSquared(F,2));
+    double r_s_inv = 1.0 / r_s;
+
+    vecSetZero(g,1);
+    vecAdd(g,1, F,0, r_s_inv * matIJ(ir,elemNr, 0,0));
+    vecAdd(g,1, F,1, r_s_inv * matIJ(ir,elemNr, 0,1));
+    vecAdd(g,1, F,2, r_s_inv * matIJ(ir,elemNr, 0,2));
+
+    vecSetZero(g,2);
+    vecAdd(g,2, F,0, r_s_inv * matIJ(ir,elemNr, 1,0));
+    vecAdd(g,2, F,1, r_s_inv * matIJ(ir,elemNr, 1,1));
+    vecAdd(g,2, F,2, r_s_inv * matIJ(ir,elemNr, 1,2));
+
+    vecSetZero(g,3);
+    vecAdd(g,3, F,0, r_s_inv * matIJ(ir,elemNr, 2,0));
+    vecAdd(g,3, F,1, r_s_inv * matIJ(ir,elemNr, 2,1));
+    vecAdd(g,3, F,2, r_s_inv * matIJ(ir,elemNr, 2,2));
+
+    C = r_s; 
+
+
+    applyToElem(elemNr, C, devCompliance, dt, grads, invMass, invRestVolume, tetIds, pos);
+    
+    // det F = 1
+
+    vecSetDiff(P,0, pos,id1, pos,id0, 1.0);
+    vecSetDiff(P,1, pos,id2, pos,id0, 1.0);
+    vecSetDiff(P,2, pos,id3, pos,id0, 1.0);
+
+    matSetMatProduct(F,0, P,0, invRestPose,elemNr);
+
+    vecSetCross(dF,0, F,1, F,2);
+    vecSetCross(dF,1, F,2, F,0);
+    vecSetCross(dF,2, F,0, F,1);
+
+    vecSetZero(g,1);
+    vecAdd(g,1, dF,0, matIJ(ir,elemNr, 0,0));
+    vecAdd(g,1, dF,1, matIJ(ir,elemNr, 0,1));
+    vecAdd(g,1, dF,2, matIJ(ir,elemNr, 0,2));
+
+    vecSetZero(g,2);
+    vecAdd(g,2, dF,0, matIJ(ir,elemNr, 1,0));
+    vecAdd(g,2, dF,1, matIJ(ir,elemNr, 1,1));
+    vecAdd(g,2, dF,2, matIJ(ir,elemNr, 1,2));
+
+    vecSetZero(g,3);
+    vecAdd(g,3, dF,0, matIJ(ir,elemNr, 2,0));
+    vecAdd(g,3, dF,1, matIJ(ir,elemNr, 2,1));
+    vecAdd(g,3, dF,2, matIJ(ir,elemNr, 2,2));
+
+    const double lambda = 1.0/volCompliance;
+	const double mu = 1.0/devCompliance;
+
+    const double vol = matGetDeterminant(F,0);
+    C = vol - 1.0 - mu/lambda;
+
+    volError += vol - 1.0;
+    
+    applyToElem(elemNr, C, volCompliance, dt, grads, invMass, invRestVolume, tetIds, pos);
+
+    return volError;
 }

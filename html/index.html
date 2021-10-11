@@ -71,8 +71,6 @@
 				{
 					// physics data 
 					const { memory } = neohookeanModule.instance.exports
-					memory.grow(4);
-
 
 					this.numParticles = vertices.length / 3;
 					this.numElems = tetIds.length / 4;
@@ -308,7 +306,7 @@
 
 				simulate(dt, gravity)
 				{
-					const {vecCopy} = neohookeanModule.instance.exports;
+					const {solveElem, vecCopy} = neohookeanModule.instance.exports;
 					const wasmVecAdd = neohookeanModule.instance.exports.vecAdd;
 					const wasmVecSetDiff = neohookeanModule.instance.exports.vecSetDiff;
 					// XPBD prediction
@@ -323,7 +321,7 @@
 
 					this.volError = 0.0;
 					for (let i = 0; i < this.numElems; i++) 
-						this.solveElem(i, dt);
+						this.volError +=solveElem(i, dt, this.devCompliance, this.volCompliance, this.grads.byteOffset, this.P.byteOffset, this.F.byteOffset, this.dF.byteOffset, this.invMass.byteOffset, this.invRestVolume.byteOffset, this.invRestPose.byteOffset, this.tetIds.byteOffset, this.pos.byteOffset, this.volError);
 					this.volError /= this.numElems;
 
 					// ground collision
