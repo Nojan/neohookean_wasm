@@ -42,6 +42,14 @@ double vecLengthSquared(float* a, int anr) {
 }
 
 __attribute__((used)) 
+void vecSetCross(float* a,int anr, float* b, int bnr, float* c, int cnr) {
+    anr *= 3; bnr *= 3; cnr *= 3;
+    a[anr++] = b[bnr + 1] * c[cnr + 2] - b[bnr + 2] * c[cnr + 1];
+    a[anr++] = b[bnr + 2] * c[cnr + 0] - b[bnr + 0] * c[cnr + 2];
+    a[anr]   = b[bnr + 0] * c[cnr + 1] - b[bnr + 1] * c[cnr + 0];
+}
+
+__attribute__((used)) 
 double matIJ(float* A, int anr, int row, int col) {
     return A[9*anr + 3 * col + row];
 }
