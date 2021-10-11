@@ -73,7 +73,6 @@
 					const { memory } = neohookeanModule.instance.exports
 					memory.grow(4);
 
-					const {vecCopy} = neohookeanModule.instance.exports;
 
 					this.numParticles = vertices.length / 3;
 					this.numElems = tetIds.length / 4;
@@ -83,14 +82,11 @@
 					let arrayLength = 3 * this.numParticles;
 					this.pos = new Float32Array(memory.buffer, bufferOffset, arrayLength);
 					bufferOffset += arrayLength * Float32Array.BYTES_PER_ELEMENT;
+					this.pos.set(vertices);
 
 					this.prevPos = new Float32Array(memory.buffer, bufferOffset, arrayLength);
 					bufferOffset += arrayLength * Float32Array.BYTES_PER_ELEMENT;
-
-					for (let i = 0; i < this.numParticles; i++) {
-						vecAdd(this.pos, i, vertices, i);
-						vecCopy(this.prevPos.byteOffset,i, this.pos.byteOffset,i);
-					}
+					this.prevPos.set(vertices);
 
 					this.vel = new Float32Array(memory.buffer, bufferOffset, arrayLength);
 					bufferOffset += arrayLength * Float32Array.BYTES_PER_ELEMENT;
@@ -110,9 +106,8 @@
 					arrayLength = tetIds.length;
 					this.tetIds = new Int32Array(memory.buffer, bufferOffset, arrayLength);
 					bufferOffset += arrayLength * Int32Array.BYTES_PER_ELEMENT;
-					for (let i = 0; i < arrayLength; i++) {
-						this.tetIds[i] = tetIds[i];
-					}
+					this.tetIds.set(tetIds);
+
 					this.volError = 0.0;
 
 					arrayLength = 3;
