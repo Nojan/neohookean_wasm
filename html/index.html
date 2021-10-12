@@ -783,8 +783,6 @@
 			}
 
 			function matSetMatProduct(Dst,dnr, A,anr, B,bnr) {
-				const {matSetVecProduct} = neohookeanModule.instance.exports;
-
 				dnr *= 3; bnr *= 3;
 				matSetVecProduct(Dst.byteOffset,dnr++, A.byteOffset,anr, B.byteOffset,bnr++);
 				matSetVecProduct(Dst.byteOffset,dnr++, A.byteOffset,anr, B.byteOffset,bnr++);
