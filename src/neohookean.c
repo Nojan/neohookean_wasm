@@ -1,7 +1,6 @@
 //emcc src/neohookean.c -s TOTAL_MEMORY=32MB -O3 --no-entry -o html/neohookean.wasm
 #include <math.h>
 
-__attribute__((used)) 
 void vecSetZero(float* a, int anr) {
     anr *= 3;
     a[anr++] = 0.f;
@@ -9,7 +8,6 @@ void vecSetZero(float* a, int anr) {
     a[anr]   = 0.f;
 }
 
-__attribute__((used)) 
 void vecCopy(float* a, int anr, float* b, int bnr) {
     anr *= 3; bnr *= 3;
     a[anr++] = b[bnr++]; 
@@ -17,7 +15,6 @@ void vecCopy(float* a, int anr, float* b, int bnr) {
     a[anr]   = b[bnr];
 }
 
-__attribute__((used)) 
 void vecAdd(float* a, int anr, float* b, int bnr, double s) {
     float scale = s;
     anr *= 3; bnr *= 3;
@@ -26,7 +23,6 @@ void vecAdd(float* a, int anr, float* b, int bnr, double s) {
     a[anr]   += b[bnr] * scale;
 }
 
-__attribute__((used)) 
 void vecSetDiff(float* dst, int dnr, float* a, int anr, float* b, int bnr, double s) {
     float scale = s;
     dnr *= 3; anr *= 3; bnr *= 3;
@@ -35,14 +31,12 @@ void vecSetDiff(float* dst, int dnr, float* a, int anr, float* b, int bnr, doubl
     dst[dnr]   = (a[anr] - b[bnr]) * scale;
 }
 
-__attribute__((used)) 
 double vecLengthSquared(float* a, int anr) {
     anr *= 3;
     double a0 = a[anr], a1 = a[anr + 1], a2 = a[anr + 2];
     return a0 * a0 + a1 * a1 + a2 * a2;
 }
 
-__attribute__((used)) 
 void vecSetCross(float* a,int anr, float* b, int bnr, float* c, int cnr) {
     anr *= 3; bnr *= 3; cnr *= 3;
     a[anr++] = b[bnr + 1] * c[cnr + 2] - b[bnr + 2] * c[cnr + 1];
@@ -50,7 +44,6 @@ void vecSetCross(float* a,int anr, float* b, int bnr, float* c, int cnr) {
     a[anr]   = b[bnr + 0] * c[cnr + 1] - b[bnr + 1] * c[cnr + 0];
 }
 
-__attribute__((used)) 
 void vecSetClamped(float* dst, int dnr, float* a, int anr, float* b, int bnr) {
     dnr *= 3; anr *= 3; bnr *= 3;
     dst[dnr] = fmax(a[anr++], fmin(b[bnr++], dst[dnr])); dnr++;
@@ -58,12 +51,10 @@ void vecSetClamped(float* dst, int dnr, float* a, int anr, float* b, int bnr) {
     dst[dnr] = fmax(a[anr++], fmin(b[bnr++], dst[dnr])); dnr++;
 }
 
-__attribute__((used)) 
 double matIJ(float* A, int anr, int row, int col) {
     return A[9*anr + 3 * col + row];
 }
 
-__attribute__((used)) 
 void matSetVecProduct(float* dst, int dnr, float* A, int anr, float* b, int bnr) {
     bnr *= 3; anr *= 3;
     const double b0 = b[bnr++];
@@ -75,7 +66,6 @@ void matSetVecProduct(float* dst, int dnr, float* A, int anr, float* b, int bnr)
     vecAdd(dst,dnr, A,anr,   b2);
 }
 
-__attribute__((used)) 
 void matSetMatProduct(float* Dst, int dnr, float* A, int anr, float* B, int bnr) {
     dnr *= 3; bnr *= 3;
     matSetVecProduct(Dst,dnr++, A,anr, B,bnr++);
@@ -83,7 +73,6 @@ void matSetMatProduct(float* Dst, int dnr, float* A, int anr, float* B, int bnr)
     matSetVecProduct(Dst,dnr++, A,anr, B,bnr++);
 }
 
-__attribute__((used)) 
 double matGetDeterminant(float* A, int anr) {
     anr *= 9;
     double a11 = A[anr + 0], a12 = A[anr + 3], a13 = A[anr + 6];
@@ -92,7 +81,6 @@ double matGetDeterminant(float* A, int anr) {
     return a11*a22*a33 + a12*a23*a31 + a13*a21*a32 - a13*a22*a31 - a12*a21*a33 - a11*a23*a32;
 }
 
-__attribute__((used)) 
 void applyToElem(int elemNr, double C, double compliance, double dt, float* grads, float* invMass, float* invRestVolume, int* tetIds, float* pos) 
 {
     if (C == 0.0)
@@ -121,7 +109,6 @@ void applyToElem(int elemNr, double C, double compliance, double dt, float* grad
     }
 }
 
-__attribute__((used)) 
 double solveElem(int elemNr, double dt, double devCompliance, double volCompliance, float* grads, float* P, float* F, float* dF, float* invMass, float* invRestVolume, float* invRestPose, int* tetIds, float* pos, double volError) 
 {
     double C = 0.0;
@@ -204,7 +191,6 @@ double solveElem(int elemNr, double dt, double devCompliance, double volComplian
     return volError;
 }
 
-__attribute__((used)) 
 double substep(double dt, int numParticles, int numElems, double devCompliance, double volCompliance, float* grads, float* P, float* F, float* dF, float* invMass, float* invRestVolume, float* invRestPose, int* tetIds, float* pos, float* prevPos, float* vel)
 {
     const double physicsParams_friction = 1000.0;
