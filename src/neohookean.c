@@ -203,3 +203,59 @@ double solveElem(int elemNr, double dt, double devCompliance, double volComplian
 
     return volError;
 }
+
+__attribute__((used)) 
+double substep(double dt, int numParticles, int numElems, double devCompliance, double volCompliance, float* grads, float* P, float* F, float* dF, float* invMass, float* invRestVolume, float* invRestPose, int* tetIds, float* pos, float* prevPos, float* vel)
+{
+    const double physicsParams_friction = 1000.0;
+    float physicsParams_worldBounds[] = {-2.5f,-1.0f, -2.5f, 2.5f, 10.0f, 2.5f};
+    float gravity[] = {0.0, -10.0, 0.0};
+    
+    // XPBD prediction
+
+    for (int i = 0; i < numParticles; i++) {
+        vecAdd(vel,i, gravity,0, dt);
+        vecCopy(prevPos,i, pos,i);
+        vecAdd(pos,i, vel,i, dt);
+    }
+
+    // solve
+
+    double volError = 0.0;
+    for (int i = 0; i < numElems; i++) 
+        volError += solveElem(i, dt, devCompliance, volCompliance, grads, P, F, dF, invMass, invRestVolume, invRestPose, tetIds, pos, volError);
+    volError /= (double)numElems;
+
+    // ground collision
+
+    for (int i = 0; i < numParticles; i++) {
+
+        vecSetClamped(pos,i, physicsParams_worldBounds,0, 
+            physicsParams_worldBounds,1);
+
+        if (pos[3 * i + 1] < 0.0) {
+            pos[3 * i + 1] = 0.0;
+
+            // simple friction
+            vecSetDiff(F,0, prevPos,i, pos,i, 1.0);
+
+            pos[3 * i] += F[0] * fmin(1.0, dt * physicsParams_friction);
+            pos[3 * i + 2] += F[2] * fmin(1.0, dt * physicsParams_friction);
+
+            // this.pos[3 * i] = this.prevPos[3 * i];
+            // this.pos[3 * i + 2] = this.prevPos[3 * i + 2];
+        }
+
+    }
+
+    // if (this.grabId >= 0) {
+    //     vecCopy(this.pos.byteOffset,this.grabId, this.grabPos.byteOffset,0);
+    // }
+
+    // XPBD velocity update
+
+    for (int i = 0; i < numParticles; i++) 
+        vecSetDiff(vel,i, pos,i, prevPos,i, 1.0 / dt);
+
+    return volError;
+}
