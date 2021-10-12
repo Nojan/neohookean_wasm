@@ -259,3 +259,14 @@ double substep(double dt, int numParticles, int numElems, double devCompliance, 
 
     return volError;
 }
+
+__attribute__((used)) 
+double physicsStep(int substepcount, double dt, int numParticles, int numElems, double devCompliance, double volCompliance, float* grads, float* P, float* F, float* dF, float* invMass, float* invRestVolume, float* invRestPose, int* tetIds, float* pos, float* prevPos, float* vel)
+{
+    double volError = 0.0;
+    for(int substepidx = 0; substepidx < substepcount; ++substepidx)
+    {
+        volError = substep(dt, numParticles, numElems, devCompliance, volCompliance, grads, P, F, dF, invMass, invRestVolume, invRestPose, tetIds, pos, prevPos, vel);
+    }
+    return volError;
+}

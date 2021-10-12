@@ -448,15 +448,14 @@
 			// ------------------------------------------------------------------
 			function simulate() 
 			{
-				const { substep }  = neohookeanModule.instance.exports;
+				const { physicsStep }  = neohookeanModule.instance.exports;
 				var dt = physicsParams.timeStep / physicsParams.numSubsteps;
 
-				for (let step = 0; step < physicsParams.numSubsteps; step++) {
-					for (let i = 0; i < physicsScene.softBodies.length; i++) {
-						var b = physicsScene.softBodies[i];
-						b.volError = substep(dt, b.numParticles, b.numElems, b.devCompliance, b.volCompliance, b.grads.byteOffset, b.P.byteOffset, b.F.byteOffset, b.dF.byteOffset, b.invMass.byteOffset, b.invRestVolume.byteOffset, b.invRestPose.byteOffset, b.tetIds.byteOffset, b.pos.byteOffset, b.prevPos.byteOffset, b.vel.byteOffset);
-					}
+				for (let i = 0; i < physicsScene.softBodies.length; i++) {
+					var b = physicsScene.softBodies[i];
+					b.volError = physicsStep(physicsParams.numSubsteps, dt, b.numParticles, b.numElems, b.devCompliance, b.volCompliance, b.grads.byteOffset, b.P.byteOffset, b.F.byteOffset, b.dF.byteOffset, b.invMass.byteOffset, b.invRestVolume.byteOffset, b.invRestPose.byteOffset, b.tetIds.byteOffset, b.pos.byteOffset, b.prevPos.byteOffset, b.vel.byteOffset);
 				}
+
 				for (let i = 0; i < physicsScene.softBodies.length; i++) {
 					physicsScene.softBodies[i].endFrame();
 				}
