@@ -1,4 +1,4 @@
-//emcc src/neohookean.c -s TOTAL_MEMORY=32MB -O3 --no-entry -o html/neohookean.wasm
+//emcc src/neohookean.c -Wall -s TOTAL_MEMORY=6MB -O3 --no-entry -flto -o html/neohookean.wasm
 #include <math.h>
 
 void vecSetZero(float* a, int anr) {
