@@ -15,25 +15,23 @@ void vecCopy(float* a, int anr, float* b, int bnr) {
     a[anr]   = b[bnr];
 }
 
-void vecAdd(float* a, int anr, float* b, int bnr, double s) {
-    float scale = s;
+void vecAdd(float* a, int anr, float* b, int bnr, float scale) {
     anr *= 3; bnr *= 3;
     a[anr++] += b[bnr++] * scale; 
     a[anr++] += b[bnr++] * scale; 
     a[anr]   += b[bnr] * scale;
 }
 
-void vecSetDiff(float* dst, int dnr, float* a, int anr, float* b, int bnr, double s) {
-    float scale = s;
+void vecSetDiff(float* dst, int dnr, float* a, int anr, float* b, int bnr, float scale) {
     dnr *= 3; anr *= 3; bnr *= 3;
     dst[dnr++] = (a[anr++] - b[bnr++]) * scale;
     dst[dnr++] = (a[anr++] - b[bnr++]) * scale;
     dst[dnr]   = (a[anr] - b[bnr]) * scale;
 }
 
-double vecLengthSquared(float* a, int anr) {
+float vecLengthSquared(float* a, int anr) {
     anr *= 3;
-    double a0 = a[anr], a1 = a[anr + 1], a2 = a[anr + 2];
+    float a0 = a[anr], a1 = a[anr + 1], a2 = a[anr + 2];
     return a0 * a0 + a1 * a1 + a2 * a2;
 }
 
@@ -46,20 +44,20 @@ void vecSetCross(float* a,int anr, float* b, int bnr, float* c, int cnr) {
 
 void vecSetClamped(float* dst, int dnr, float* a, int anr, float* b, int bnr) {
     dnr *= 3; anr *= 3; bnr *= 3;
-    dst[dnr] = fmax(a[anr++], fmin(b[bnr++], dst[dnr])); dnr++;
-    dst[dnr] = fmax(a[anr++], fmin(b[bnr++], dst[dnr])); dnr++;
-    dst[dnr] = fmax(a[anr++], fmin(b[bnr++], dst[dnr])); dnr++;
+    dst[dnr] = fmaxf(a[anr++], fminf(b[bnr++], dst[dnr])); dnr++;
+    dst[dnr] = fmaxf(a[anr++], fminf(b[bnr++], dst[dnr])); dnr++;
+    dst[dnr] = fmaxf(a[anr++], fminf(b[bnr++], dst[dnr])); dnr++;
 }
 
-double matIJ(float* A, int anr, int row, int col) {
+float matIJ(float* A, int anr, int row, int col) {
     return A[9*anr + 3 * col + row];
 }
 
 void matSetVecProduct(float* dst, int dnr, float* A, int anr, float* b, int bnr) {
     bnr *= 3; anr *= 3;
-    const double b0 = b[bnr++];
-    const double b1 = b[bnr++];
-    const double b2 = b[bnr];
+    const float b0 = b[bnr++];
+    const float b1 = b[bnr++];
+    const float b2 = b[bnr];
     vecSetZero(dst,dnr);
     vecAdd(dst,dnr, A,anr++, b0);
     vecAdd(dst,dnr, A,anr++, b1);
@@ -73,35 +71,35 @@ void matSetMatProduct(float* Dst, int dnr, float* A, int anr, float* B, int bnr)
     matSetVecProduct(Dst,dnr++, A,anr, B,bnr++);
 }
 
-double matGetDeterminant(float* A, int anr) {
+float matGetDeterminant(float* A, int anr) {
     anr *= 9;
-    double a11 = A[anr + 0], a12 = A[anr + 3], a13 = A[anr + 6];
-    double a21 = A[anr + 1], a22 = A[anr + 4], a23 = A[anr + 7];
-    double a31 = A[anr + 2], a32 = A[anr + 5], a33 = A[anr + 8];
+    float a11 = A[anr + 0], a12 = A[anr + 3], a13 = A[anr + 6];
+    float a21 = A[anr + 1], a22 = A[anr + 4], a23 = A[anr + 7];
+    float a31 = A[anr + 2], a32 = A[anr + 5], a33 = A[anr + 8];
     return a11*a22*a33 + a12*a23*a31 + a13*a21*a32 - a13*a22*a31 - a12*a21*a33 - a11*a23*a32;
 }
 
-void applyToElem(int elemNr, double C, double compliance, double dt, float* grads, float* invMass, float* invRestVolume, int* tetIds, float* pos) 
+void applyToElem(int elemNr, float C, float compliance, float dt, float* grads, float* invMass, float* invRestVolume, int* tetIds, float* pos) 
 {
-    if (C == 0.0)
+    if (C == 0.f)
         return;
     float* g = grads;
 
     vecSetZero(g,0);
-    vecAdd(g,0, g,1, -1.0);
-    vecAdd(g,0, g,2, -1.0);
-    vecAdd(g,0, g,3, -1.0);
+    vecAdd(g,0, g,1, -1.f);
+    vecAdd(g,0, g,2, -1.f);
+    vecAdd(g,0, g,3, -1.f);
 
-    double w = 0.0;
+    float w = 0.f;
     for (int i = 0; i < 4; i++) {
         int id = tetIds[4 * elemNr + i];
         w += vecLengthSquared(g,i) * invMass[id];
     }
 
-    if (w == 0.0) 
+    if (w == 0.f) 
         return;
-    double alpha = compliance / dt / dt * invRestVolume[elemNr];
-    double dlambda = -C / (w + alpha);
+    float alpha = compliance / dt / dt * invRestVolume[elemNr];
+    float dlambda = -C / (w + alpha);
 
     for (int i = 0; i < 4; i++) {
         int id = tetIds[4 * elemNr + i];
@@ -109,9 +107,9 @@ void applyToElem(int elemNr, double C, double compliance, double dt, float* grad
     }
 }
 
-double solveElem(int elemNr, double dt, double devCompliance, double volCompliance, float* grads, float* P, float* F, float* dF, float* invMass, float* invRestVolume, float* invRestPose, int* tetIds, float* pos, double volError) 
+float solveElem(int elemNr, float dt, float devCompliance, float volCompliance, float* grads, float* P, float* F, float* dF, float* invMass, float* invRestVolume, float* invRestPose, int* tetIds, float* pos, float volError) 
 {
-    double C = 0.0;
+    float C = 0.f;
     float* g = grads;
     float* ir = invRestPose;
 
@@ -122,14 +120,14 @@ double solveElem(int elemNr, double dt, double devCompliance, double volComplian
     int id2 = tetIds[4 * elemNr + 2];
     int id3 = tetIds[4 * elemNr + 3];
 
-    vecSetDiff(P,0, pos,id1, pos,id0, 1.0);
-    vecSetDiff(P,1, pos,id2, pos,id0, 1.0);
-    vecSetDiff(P,2, pos,id3, pos,id0, 1.0);
+    vecSetDiff(P,0, pos,id1, pos,id0, 1.f);
+    vecSetDiff(P,1, pos,id2, pos,id0, 1.f);
+    vecSetDiff(P,2, pos,id3, pos,id0, 1.f);
 
     matSetMatProduct(F,0, P,0, invRestPose,elemNr);
 
-    double r_s = sqrt(vecLengthSquared(F,0) + vecLengthSquared(F,1) + vecLengthSquared(F,2));
-    double r_s_inv = 1.0 / r_s;
+    float r_s = sqrt(vecLengthSquared(F,0) + vecLengthSquared(F,1) + vecLengthSquared(F,2));
+    float r_s_inv = 1.f / r_s;
 
     vecSetZero(g,1);
     vecAdd(g,1, F,0, r_s_inv * matIJ(ir,elemNr, 0,0));
@@ -153,9 +151,9 @@ double solveElem(int elemNr, double dt, double devCompliance, double volComplian
     
     // det F = 1
 
-    vecSetDiff(P,0, pos,id1, pos,id0, 1.0);
-    vecSetDiff(P,1, pos,id2, pos,id0, 1.0);
-    vecSetDiff(P,2, pos,id3, pos,id0, 1.0);
+    vecSetDiff(P,0, pos,id1, pos,id0, 1.f);
+    vecSetDiff(P,1, pos,id2, pos,id0, 1.f);
+    vecSetDiff(P,2, pos,id3, pos,id0, 1.f);
 
     matSetMatProduct(F,0, P,0, invRestPose,elemNr);
 
@@ -178,24 +176,24 @@ double solveElem(int elemNr, double dt, double devCompliance, double volComplian
     vecAdd(g,3, dF,1, matIJ(ir,elemNr, 2,1));
     vecAdd(g,3, dF,2, matIJ(ir,elemNr, 2,2));
 
-    const double lambda = 1.0/volCompliance;
-	const double mu = 1.0/devCompliance;
+    const float lambda = 1.f/volCompliance;
+	const float mu = 1.f/devCompliance;
 
-    const double vol = matGetDeterminant(F,0);
-    C = vol - 1.0 - mu/lambda;
+    const float vol = matGetDeterminant(F,0);
+    C = vol - 1.f - mu/lambda;
 
-    volError += vol - 1.0;
+    volError += vol - 1.f;
     
     applyToElem(elemNr, C, volCompliance, dt, grads, invMass, invRestVolume, tetIds, pos);
 
     return volError;
 }
 
-double substep(double dt, int numParticles, int numElems, double devCompliance, double volCompliance, float* grads, float* P, float* F, float* dF, float* invMass, float* invRestVolume, float* invRestPose, int* tetIds, float* pos, float* prevPos, float* vel)
+float substep(float dt, int numParticles, int numElems, float devCompliance, float volCompliance, float* grads, float* P, float* F, float* dF, float* invMass, float* invRestVolume, float* invRestPose, int* tetIds, float* pos, float* prevPos, float* vel)
 {
-    const double physicsParams_friction = 1000.0;
+    const float physicsParams_friction = 1000.f;
     float physicsParams_worldBounds[] = {-2.5f,-1.0f, -2.5f, 2.5f, 10.0f, 2.5f};
-    float gravity[] = {0.0, -10.0, 0.0};
+    float gravity[] = {0.f, -10.f, 0.f};
     
     // XPBD prediction
 
@@ -207,10 +205,10 @@ double substep(double dt, int numParticles, int numElems, double devCompliance, 
 
     // solve
 
-    double volError = 0.0;
+    float volError = 0.f;
     for (int i = 0; i < numElems; i++) 
         volError += solveElem(i, dt, devCompliance, volCompliance, grads, P, F, dF, invMass, invRestVolume, invRestPose, tetIds, pos, volError);
-    volError /= (double)numElems;
+    volError /= (float)numElems;
 
     // ground collision
 
@@ -219,14 +217,14 @@ double substep(double dt, int numParticles, int numElems, double devCompliance, 
         vecSetClamped(pos,i, physicsParams_worldBounds,0, 
             physicsParams_worldBounds,1);
 
-        if (pos[3 * i + 1] < 0.0) {
-            pos[3 * i + 1] = 0.0;
+        if (pos[3 * i + 1] < 0.f) {
+            pos[3 * i + 1] = 0.f;
 
             // simple friction
-            vecSetDiff(F,0, prevPos,i, pos,i, 1.0);
+            vecSetDiff(F,0, prevPos,i, pos,i, 1.f);
 
-            pos[3 * i] += F[0] * fmin(1.0, dt * physicsParams_friction);
-            pos[3 * i + 2] += F[2] * fmin(1.0, dt * physicsParams_friction);
+            pos[3 * i] += F[0] * fminf(1.f, dt * physicsParams_friction);
+            pos[3 * i + 2] += F[2] * fminf(1.f, dt * physicsParams_friction);
 
             // this.pos[3 * i] = this.prevPos[3 * i];
             // this.pos[3 * i + 2] = this.prevPos[3 * i + 2];
@@ -241,7 +239,7 @@ double substep(double dt, int numParticles, int numElems, double devCompliance, 
     // XPBD velocity update
 
     for (int i = 0; i < numParticles; i++) 
-        vecSetDiff(vel,i, pos,i, prevPos,i, 1.0 / dt);
+        vecSetDiff(vel,i, pos,i, prevPos,i, 1.f / dt);
 
     return volError;
 }
