@@ -51,6 +51,14 @@ void vecSetCross(float* a,int anr, float* b, int bnr, float* c, int cnr) {
 }
 
 __attribute__((used)) 
+void vecSetClamped(float* dst, int dnr, float* a, int anr, float* b, int bnr) {
+    dnr *= 3; anr *= 3; bnr *= 3;
+    dst[dnr] = fmax(a[anr++], fmin(b[bnr++], dst[dnr])); dnr++;
+    dst[dnr] = fmax(a[anr++], fmin(b[bnr++], dst[dnr])); dnr++;
+    dst[dnr] = fmax(a[anr++], fmin(b[bnr++], dst[dnr])); dnr++;
+}
+
+__attribute__((used)) 
 double matIJ(float* A, int anr, int row, int col) {
     return A[9*anr + 3 * col + row];
 }
